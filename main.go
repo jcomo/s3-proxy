@@ -2,9 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type User struct {
@@ -46,5 +48,12 @@ func main() {
 		handler.HandleHost(site.Host, authHandler)
 	}
 
-	log.Fatal(http.ListenAndServe(":8080", handler))
+	port := flag.Int("port", 8080, "Port to listen on")
+
+	flag.Parse()
+
+	portStr := strconv.FormatInt(int64(*port), 10)
+
+	log.Println("s3-proxy is listening on port " + portStr)
+	log.Fatal(http.ListenAndServe(":"+portStr, handler))
 }
