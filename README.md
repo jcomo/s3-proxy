@@ -4,6 +4,8 @@
 A proxying server to private buckets in S3
 </p>
 
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
 ### Introduction
 
 There are many use cases where S3 is used as an object store for objects that may be intended to be accessed publicly.
