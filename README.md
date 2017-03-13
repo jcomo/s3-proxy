@@ -62,3 +62,4 @@ Run the JSON file through a JSON compacter before setting the environment variab
 
 It is good practice to utilize proper user management with the keys that are deployed with s3-proxy.
 Any keys are that are used for proxying should be limited to have read-only access to the S3 buckets that they intend to fetch from.
+Read-only access translates to the permissions: s3:GetObject, s3:GetBucketWebsite, s3:ListBucket.

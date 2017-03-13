@@ -5,6 +5,9 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 type HostDispatchingHandler struct {
@@ -63,7 +66,18 @@ func NewProxyHandler(proxy S3Proxy) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		obj, err := proxy.Get(r.URL.Path)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			if awsErr, ok := err.(awserr.Error); ok {
+				switch awsErr.Code() {
+				case s3.ErrCodeNoSuchBucket:
+				case s3.ErrCodeNoSuchKey:
+					http.Error(w, err.Error(), http.StatusNotFound)
+				default:
+					http.Error(w, err.Error(), http.StatusUnauthorized)
+				}
+			} else {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+
 			return
 		}
 
