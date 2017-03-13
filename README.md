@@ -47,7 +47,10 @@ The options are the same with the exception of the host field that must be speci
   "awsSecret": "<YOUR AWS SECRET HERE>",
   "awsRegion": "us-east-1",
   "awsBucket": "my-site-bucket",
-  "users": ["user1:pass", "user2:pass"]
+  "users": [
+    {"name": "user1", "password": "pass"},
+    {"name": "user2", "password": "pass"}
+  ]
 }
 ```
 

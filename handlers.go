@@ -8,16 +8,16 @@ import (
 )
 
 type HostDispatchingHandler struct {
-	hosts map[string]http.HandlerFunc
+	hosts map[string]http.Handler
 }
 
 func NewHostDispatchingHandler() *HostDispatchingHandler {
 	return &HostDispatchingHandler{
-		hosts: make(map[string]http.HandlerFunc),
+		hosts: make(map[string]http.Handler),
 	}
 }
 
-func (h *HostDispatchingHandler) HandleHost(host string, handler http.HandlerFunc) {
+func (h *HostDispatchingHandler) HandleHost(host string, handler http.Handler) {
 	h.hosts[host] = handler
 }
 
@@ -28,10 +28,10 @@ func (h *HostDispatchingHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	handler(w, r)
+	handler.ServeHTTP(w, r)
 }
 
-func NewBasicAuthHandler(users []User, next http.HandlerFunc) http.HandlerFunc {
+func NewBasicAuthHandler(users []User, next http.Handler) http.HandlerFunc {
 	m := make(map[string]string)
 	for _, u := range users {
 		m[u.Name] = u.Password
@@ -55,7 +55,7 @@ func NewBasicAuthHandler(users []User, next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		next(w, r)
+		next.ServeHTTP(w, r)
 	}
 }
 
