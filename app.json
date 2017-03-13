@@ -1,0 +1,5 @@
+{
+  "name": "s3-proxy",
+  "description": "A proxying server to private buckets in S3",
+  "keywords": ["s3", "golang", "go", "proxy"]
+}
