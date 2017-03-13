@@ -46,7 +46,7 @@ func createMulti() (http.Handler, error) {
 	handler := NewHostDispatchingHandler()
 
 	for i, site := range cfg {
-		err = site.validate(true)
+		err = site.validateWithHost()
 
 		if err != nil {
 			msg := fmt.Sprintf("%v in configuration at position %d", err, i)
@@ -73,7 +73,7 @@ func createSingle() (http.Handler, error) {
 		Users:     users,
 	}
 
-	err = s.validate(false)
+	err = s.validate()
 
 	if err != nil {
 		return nil, err
@@ -118,11 +118,15 @@ func parseUsers(us string) ([]User, error) {
 	return users, nil
 }
 
-func (s Site) validate(withHost bool) error {
-	if withHost && s.Host == "" {
+func (s Site) validateWithHost() error {
+	if s.Host == "" {
 		return errors.New("Host not specified")
 	}
 
+	return s.validate()
+}
+
+func (s Site) validate() error {
 	if s.AWSKey == "" {
 		return errors.New("AWS Key not specified")
 	}
