@@ -62,6 +62,20 @@ func NewBasicAuthHandler(users []User, next http.Handler) http.HandlerFunc {
 	}
 }
 
+func NewWebsiteHandler(next http.Handler, cfg *s3.GetBucketWebsiteOutput) http.HandlerFunc {
+	suffix := cfg.IndexDocument.Suffix
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		path := r.URL.Path
+
+		if path == "" || path[len(path)-1] == '/' {
+			r.URL.Path += *suffix
+		}
+
+		next.ServeHTTP(w, r)
+	}
+}
+
 func NewProxyHandler(proxy S3Proxy) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		obj, err := proxy.Get(r.URL.Path)

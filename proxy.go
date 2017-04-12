@@ -9,6 +9,7 @@ import (
 
 type S3Proxy interface {
 	Get(key string) (*s3.GetObjectOutput, error)
+	GetWebsiteConfig() (*s3.GetBucketWebsiteOutput, error)
 }
 
 type RealS3Proxy struct {
@@ -35,4 +36,12 @@ func (p *RealS3Proxy) Get(key string) (*s3.GetObjectOutput, error) {
 	}
 
 	return p.s3.GetObject(req)
+}
+
+func (p *RealS3Proxy) GetWebsiteConfig() (*s3.GetBucketWebsiteOutput, error) {
+	req := &s3.GetBucketWebsiteInput{
+		Bucket: aws.String(p.bucket),
+	}
+
+	return p.s3.GetBucketWebsite(req)
 }

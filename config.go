@@ -14,14 +14,15 @@ import (
 type sitesCfg []Site
 
 const (
-	kConfigName    = "S3PROXY_CONFIG"
-	kAWSKeyName    = "S3PROXY_AWS_KEY"
-	kAWSSecretName = "S3PROXY_AWS_SECRET"
-	kAWSRegionName = "S3PROXY_AWS_REGION"
-	kAWSBucketName = "S3PROXY_AWS_BUCKET"
-	kUsersName     = "S3PROXY_USERS"
-	kCORSKeyName   = "S3PROXY_OPTION_CORS"
-	kGzipKeyName   = "S3PROXY_OPTION_GZIP"
+	kConfigName     = "S3PROXY_CONFIG"
+	kAWSKeyName     = "S3PROXY_AWS_KEY"
+	kAWSSecretName  = "S3PROXY_AWS_SECRET"
+	kAWSRegionName  = "S3PROXY_AWS_REGION"
+	kAWSBucketName  = "S3PROXY_AWS_BUCKET"
+	kUsersName      = "S3PROXY_USERS"
+	kCORSKeyName    = "S3PROXY_OPTION_CORS"
+	kGzipKeyName    = "S3PROXY_OPTION_GZIP"
+	kWebsiteKeyName = "S3PROXY_OPTION_WEBSITE"
 )
 
 func ConfiguredProxyHandler() (http.Handler, error) {
@@ -70,8 +71,9 @@ func createSingle() (http.Handler, error) {
 	}
 
 	opts := Options{
-		CORS: os.Getenv(kCORSKeyName) == "true",
-		Gzip: os.Getenv(kGzipKeyName) == "true",
+		CORS:    os.Getenv(kCORSKeyName) == "true",
+		Gzip:    os.Getenv(kGzipKeyName) == "true",
+		Website: os.Getenv(kWebsiteKeyName) == "true",
 	}
 
 	s := Site{
@@ -97,6 +99,17 @@ func createSiteHandler(s Site) http.Handler {
 
 	proxy := NewS3Proxy(s.AWSKey, s.AWSSecret, s.AWSRegion, s.AWSBucket)
 	handler = NewProxyHandler(proxy)
+
+	if s.Options.Website {
+		cfg, err := proxy.GetWebsiteConfig()
+		if err != nil {
+			fmt.Printf("warning: site for bucket %s configured with "+
+				"website option but received error when retrieving "+
+				"website config\n\t%v", s.AWSBucket, err)
+		} else {
+			handler = NewWebsiteHandler(handler, cfg)
+		}
+	}
 
 	if s.Options.CORS {
 		handler = corsHandler(handler)

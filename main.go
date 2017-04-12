@@ -24,8 +24,9 @@ type User struct {
 }
 
 type Options struct {
-	CORS bool `json:"cors"`
-	Gzip bool `json:"gzip"`
+	CORS    bool `json:"cors"`
+	Gzip    bool `json:"gzip"`
+	Website bool `json:"website"`
 }
 
 func main() {
