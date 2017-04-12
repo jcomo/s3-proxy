@@ -21,6 +21,7 @@ const (
 	kAWSBucketName = "S3PROXY_AWS_BUCKET"
 	kUsersName     = "S3PROXY_USERS"
 	kCORSKeyName   = "S3PROXY_OPTION_CORS"
+	kGzipKeyName   = "S3PROXY_OPTION_GZIP"
 )
 
 func ConfiguredProxyHandler() (http.Handler, error) {
@@ -70,6 +71,7 @@ func createSingle() (http.Handler, error) {
 
 	opts := Options{
 		CORS: os.Getenv(kCORSKeyName) == "true",
+		Gzip: os.Getenv(kGzipKeyName) == "true",
 	}
 
 	s := Site{
@@ -98,6 +100,10 @@ func createSiteHandler(s Site) http.Handler {
 
 	if s.Options.CORS {
 		handler = corsHandler(handler)
+	}
+
+	if s.Options.Gzip {
+		handler = handlers.CompressHandler(handler)
 	}
 
 	if len(s.Users) > 0 {
