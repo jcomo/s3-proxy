@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/gorilla/handlers"
 )
 
 type sitesCfg []Site
@@ -18,6 +20,7 @@ const (
 	kAWSRegionName = "S3PROXY_AWS_REGION"
 	kAWSBucketName = "S3PROXY_AWS_BUCKET"
 	kUsersName     = "S3PROXY_USERS"
+	kCORSKeyName   = "S3PROXY_OPTION_CORS"
 )
 
 func ConfiguredProxyHandler() (http.Handler, error) {
@@ -65,12 +68,17 @@ func createSingle() (http.Handler, error) {
 		return nil, err
 	}
 
+	opts := Options{
+		CORS: os.Getenv(kCORSKeyName) == "true",
+	}
+
 	s := Site{
 		AWSKey:    os.Getenv(kAWSKeyName),
 		AWSSecret: os.Getenv(kAWSSecretName),
 		AWSRegion: os.Getenv(kAWSRegionName),
 		AWSBucket: os.Getenv(kAWSBucketName),
 		Users:     users,
+		Options:   opts,
 	}
 
 	err = s.validate()
@@ -82,16 +90,31 @@ func createSingle() (http.Handler, error) {
 	}
 }
 
-func createSiteHandler(s Site) http.HandlerFunc {
+func createSiteHandler(s Site) http.Handler {
+	var handler http.Handler
+
 	proxy := NewS3Proxy(s.AWSKey, s.AWSSecret, s.AWSRegion, s.AWSBucket)
-	proxyHandler := NewProxyHandler(proxy)
+	handler = NewProxyHandler(proxy)
+
+	if s.Options.CORS {
+		handler = corsHandler(handler)
+	}
 
 	if len(s.Users) > 0 {
-		return NewBasicAuthHandler(s.Users, proxyHandler)
+		handler = NewBasicAuthHandler(s.Users, handler)
 	} else {
 		fmt.Printf("warning: site for bucket %s has no configured users\n", s.AWSBucket)
-		return proxyHandler
 	}
+
+	return handler
+}
+
+func corsHandler(next http.Handler) http.Handler {
+	return handlers.CORS(
+		handlers.AllowedHeaders([]string{"*"}),
+		handlers.AllowedOrigins([]string{"*"}),
+		handlers.AllowedMethods([]string{"HEAD", "GET", "OPTIONS"}),
+	)(next)
 }
 
 func parseUsers(us string) ([]User, error) {
