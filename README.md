@@ -35,6 +35,7 @@ Single mode is configured via the following (required) environment variables.
 | `S3PROXY_OPTION_GZIP`    | `true` to gzip responses according to value of `Accept-Encoding` header                                                                       |
 | `S3PROXY_OPTION_CORS`    | `true` to include basic CORS headers in response                                                                                              |
 | `S3PROXY_OPTION_WEBSITE` | `true` if this bucket should use its S3 website configuration                                                                                 |
+| `S3PROXY_OPTION_PREFIX`  | Specify a prefix to be added to each path                                                                                                     |
 
 
 #### Multi Mode

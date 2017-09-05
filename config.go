@@ -23,6 +23,7 @@ const (
 	kCORSKeyName    = "S3PROXY_OPTION_CORS"
 	kGzipKeyName    = "S3PROXY_OPTION_GZIP"
 	kWebsiteKeyName = "S3PROXY_OPTION_WEBSITE"
+	kPrefixKeyName  = "S3PROXY_OPTION_PREFIX"
 )
 
 func ConfiguredProxyHandler() (http.Handler, error) {
@@ -74,6 +75,7 @@ func createSingle() (http.Handler, error) {
 		CORS:    os.Getenv(kCORSKeyName) == "true",
 		Gzip:    os.Getenv(kGzipKeyName) == "true",
 		Website: os.Getenv(kWebsiteKeyName) == "true",
+		Prefix:  os.Getenv(kPrefixKeyName),
 	}
 
 	s := Site{
@@ -98,7 +100,7 @@ func createSiteHandler(s Site) http.Handler {
 	var handler http.Handler
 
 	proxy := NewS3Proxy(s.AWSKey, s.AWSSecret, s.AWSRegion, s.AWSBucket)
-	handler = NewProxyHandler(proxy)
+	handler = NewProxyHandler(proxy, s.Options.Prefix)
 
 	if s.Options.Website {
 		cfg, err := proxy.GetWebsiteConfig()

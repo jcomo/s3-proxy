@@ -76,9 +76,14 @@ func NewWebsiteHandler(next http.Handler, cfg *s3.GetBucketWebsiteOutput) http.H
 	}
 }
 
-func NewProxyHandler(proxy S3Proxy) http.HandlerFunc {
+func NewProxyHandler(proxy S3Proxy, prefix string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		obj, err := proxy.Get(r.URL.Path)
+		path := r.URL.Path
+		if prefix != "" {
+			path = "/" + prefix + path
+		}
+
+		obj, err := proxy.Get(path)
 		if err != nil {
 			if awsErr, ok := err.(awserr.Error); ok {
 				switch awsErr.Code() {
