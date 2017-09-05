@@ -19,7 +19,7 @@ type Site struct {
 }
 
 type User struct {
-	Name     string `json:"user"`
+	Name     string `json:"name"`
 	Password string `json:"password"`
 }
 
