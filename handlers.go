@@ -10,6 +10,22 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
+func NewSSLRedirectHandler(next http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Scheme != "https" {
+			dest := "https://" + r.Host + r.URL.Path
+			if r.URL.RawQuery != "" {
+				dest += "?" + r.URL.RawQuery
+			}
+
+			http.Redirect(w, r, dest, http.StatusTemporaryRedirect)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	}
+}
+
 type HostDispatchingHandler struct {
 	hosts map[string]http.Handler
 }

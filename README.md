@@ -25,17 +25,20 @@ s3-proxy can be configured to run in single or multi mode.
 In single mode, a single set of S3 credentials (keys, bucket, and region) are configured and all requests made to the proxy will be forwarded to that bucket.
 Single mode is configured via the following (required) environment variables.
 
-| Name                     | Description                                                                                                                                   |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `S3PROXY_AWS_KEY`        | An AWS access key ID with read access to the bucket                                                                                           |
-| `S3PROXY_AWS_SECRET`     | An AWS secret key that has read access to the bucket                                                                                          |
-| `S3PROXY_AWS_REGION`     | The region where this bucket is located (eg. us-east-1)                                                                                       |
-| `S3PROXY_AWS_BUCKET`     | The name of the bucket to proxy to                                                                                                            |
-| `S3PROXY_USERS`          | A comma separated list of username/password pairs (eg. user1:pass,user2:pass). If specified, basic auth will be required to access any S3 key |
-| `S3PROXY_OPTION_GZIP`    | `true` to gzip responses according to value of `Accept-Encoding` header                                                                       |
-| `S3PROXY_OPTION_CORS`    | `true` to include basic CORS headers in response                                                                                              |
-| `S3PROXY_OPTION_WEBSITE` | `true` if this bucket should use its S3 website configuration                                                                                 |
-| `S3PROXY_OPTION_PREFIX`  | Specify a prefix to be added to each path                                                                                                     |
+| Name                       | Description                                                                                                                                   |
+| ------------------------   | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `S3PROXY_AWS_KEY`          | An AWS access key ID with read access to the bucket                                                                                           |
+| `S3PROXY_AWS_SECRET`       | An AWS secret key that has read access to the bucket                                                                                          |
+| `S3PROXY_AWS_REGION`       | The region where this bucket is located (eg. us-east-1)                                                                                       |
+| `S3PROXY_AWS_BUCKET`       | The name of the bucket to proxy to                                                                                                            |
+| `S3PROXY_USERS`            | A comma separated list of username/password pairs (eg. user1:pass,user2:pass). If specified, basic auth will be required to access any S3 key |
+| `S3PROXY_OPTION_GZIP`      | `true` to gzip responses according to value of `Accept-Encoding` header                                                                       |
+| `S3PROXY_OPTION_CORS`      | `true` to include basic CORS headers in response                                                                                              |
+| `S3PROXY_OPTION_WEBSITE`   | `true` if this bucket should use its S3 website configuration                                                                                 |
+| `S3PROXY_OPTION_PREFIX`    | Specify a prefix to be added to each path                                                                                                     |
+| `S3PROXY_OPTION_FORCE_SSL` | `true` to force all requests to https                                                                                                         |
+| `S3PROXY_OPTION_PROXIED`   | `true` to indicate that this app is running behind a proxy. This takes into account proxied headers                                           |
+
 
 
 #### Multi Mode

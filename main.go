@@ -24,10 +24,12 @@ type User struct {
 }
 
 type Options struct {
-	CORS    bool   `json:"cors"`
-	Gzip    bool   `json:"gzip"`
-	Website bool   `json:"website"`
-	Prefix  string `json:"prefix"`
+	CORS     bool   `json:"cors"`
+	Gzip     bool   `json:"gzip"`
+	Website  bool   `json:"website"`
+	Prefix   string `json:"prefix"`
+	ForceSSL bool   `json:"forceSsl"`
+	Proxied  bool   `json:"proxied"`
 }
 
 func main() {

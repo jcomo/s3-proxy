@@ -14,16 +14,18 @@ import (
 type sitesCfg []Site
 
 const (
-	kConfigName     = "S3PROXY_CONFIG"
-	kAWSKeyName     = "S3PROXY_AWS_KEY"
-	kAWSSecretName  = "S3PROXY_AWS_SECRET"
-	kAWSRegionName  = "S3PROXY_AWS_REGION"
-	kAWSBucketName  = "S3PROXY_AWS_BUCKET"
-	kUsersName      = "S3PROXY_USERS"
-	kCORSKeyName    = "S3PROXY_OPTION_CORS"
-	kGzipKeyName    = "S3PROXY_OPTION_GZIP"
-	kWebsiteKeyName = "S3PROXY_OPTION_WEBSITE"
-	kPrefixKeyName  = "S3PROXY_OPTION_PREFIX"
+	kConfigName      = "S3PROXY_CONFIG"
+	kAWSKeyName      = "S3PROXY_AWS_KEY"
+	kAWSSecretName   = "S3PROXY_AWS_SECRET"
+	kAWSRegionName   = "S3PROXY_AWS_REGION"
+	kAWSBucketName   = "S3PROXY_AWS_BUCKET"
+	kUsersName       = "S3PROXY_USERS"
+	kCORSKeyName     = "S3PROXY_OPTION_CORS"
+	kGzipKeyName     = "S3PROXY_OPTION_GZIP"
+	kWebsiteKeyName  = "S3PROXY_OPTION_WEBSITE"
+	kPrefixKeyName   = "S3PROXY_OPTION_PREFIX"
+	kForceSSLKeyName = "S3PROXY_OPTION_FORCE_SSL"
+	kProxiedKeyName  = "S3PROXY_OPTION_PROXIED"
 )
 
 func ConfiguredProxyHandler() (http.Handler, error) {
@@ -72,10 +74,12 @@ func createSingle() (http.Handler, error) {
 	}
 
 	opts := Options{
-		CORS:    os.Getenv(kCORSKeyName) == "true",
-		Gzip:    os.Getenv(kGzipKeyName) == "true",
-		Website: os.Getenv(kWebsiteKeyName) == "true",
-		Prefix:  os.Getenv(kPrefixKeyName),
+		CORS:     os.Getenv(kCORSKeyName) == "true",
+		Gzip:     os.Getenv(kGzipKeyName) == "true",
+		Website:  os.Getenv(kWebsiteKeyName) == "true",
+		Prefix:   os.Getenv(kPrefixKeyName),
+		ForceSSL: os.Getenv(kForceSSLKeyName) == "true",
+		Proxied:  os.Getenv(kProxiedKeyName) == "true",
 	}
 
 	s := Site{
@@ -125,6 +129,14 @@ func createSiteHandler(s Site) http.Handler {
 		handler = NewBasicAuthHandler(s.Users, handler)
 	} else {
 		fmt.Printf("warning: site for bucket %s has no configured users\n", s.AWSBucket)
+	}
+
+	if s.Options.ForceSSL {
+		handler = NewSSLRedirectHandler(handler)
+	}
+
+	if s.Options.Proxied {
+		handler = handlers.ProxyHeaders(handler)
 	}
 
 	return handler
