@@ -30,6 +30,7 @@ type Options struct {
 	Prefix   string `json:"prefix"`
 	ForceSSL bool   `json:"forceSsl"`
 	Proxied  bool   `json:"proxied"`
+	Endpoint string `json:"endpoint"`
 }
 
 func main() {

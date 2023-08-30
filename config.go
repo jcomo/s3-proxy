@@ -26,6 +26,7 @@ const (
 	kPrefixKeyName   = "S3PROXY_OPTION_PREFIX"
 	kForceSSLKeyName = "S3PROXY_OPTION_FORCE_SSL"
 	kProxiedKeyName  = "S3PROXY_OPTION_PROXIED"
+	kEndpointKeyName = "S3PROXY_OPTION_ENDPOINT"
 )
 
 func ConfiguredProxyHandler() (http.Handler, error) {
@@ -80,6 +81,7 @@ func createSingle() (http.Handler, error) {
 		Prefix:   os.Getenv(kPrefixKeyName),
 		ForceSSL: os.Getenv(kForceSSLKeyName) == "true",
 		Proxied:  os.Getenv(kProxiedKeyName) == "true",
+		Endpoint: os.Getenv(kEndpointKeyName),
 	}
 
 	s := Site{
@@ -103,7 +105,7 @@ func createSingle() (http.Handler, error) {
 func createSiteHandler(s Site) http.Handler {
 	var handler http.Handler
 
-	proxy := NewS3Proxy(s.AWSKey, s.AWSSecret, s.AWSRegion, s.AWSBucket)
+	proxy := NewS3Proxy(s.AWSKey, s.AWSSecret, s.AWSRegion, s.AWSBucket, s.Options.Endpoint)
 	handler = NewProxyHandler(proxy, s.Options.Prefix)
 
 	if s.Options.Website {

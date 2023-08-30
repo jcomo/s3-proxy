@@ -1,1 +1,8 @@
+# Original
 sites.json
+
+# Build Files
+/s3-proxy
+
+# Vendor
+/vendor

@@ -5,6 +5,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/aws/endpoints"
 )
 
 type S3Proxy interface {
@@ -17,10 +18,21 @@ type RealS3Proxy struct {
 	s3     *s3.S3
 }
 
-func NewS3Proxy(key, secret, region, bucket string) S3Proxy {
+func NewS3Proxy(key, secret, region, bucket, endpoint string) S3Proxy {
+	endpointResolver := func(service, region string, optFns ...func(*endpoints.Options)) (endpoints.ResolvedEndpoint, error) {
+		if endpoint != "" {
+			return endpoints.ResolvedEndpoint{
+				URL: endpoint,
+			}, nil
+		}
+	
+		return endpoints.DefaultResolver().EndpointFor(service, region, optFns...)
+	}
+
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region:      aws.String(region),
 		Credentials: credentials.NewStaticCredentials(key, secret, ""),
+		EndpointResolver: endpoints.ResolverFunc(endpointResolver),
 	}))
 
 	return &RealS3Proxy{
